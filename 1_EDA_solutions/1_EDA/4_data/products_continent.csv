@@ -1,0 +1,15 @@
+,Product,Price,City,State,Country,Continent
+0,Product2,3600,Prague,Central Bohemia,Czech Republic,Australia
+1,Product1,1200,Hradec Kralove,East Bohemia,Czech Republic,Europe
+2,Product1,1200,Irpin',Kiev,Ukraine,Europe
+3,Product1,1200,Santo Domingo City,Distrito Nacional,Dominican Republic,Europe
+4,Product1,1200,Taicheng,Guangdong,China,Europe
+5,Product1,1200,Athina,Attiki,Greece,Europe
+6,Product1,1200,Santa Barbaraa,Heredia,Costa Rica,Africa
+7,Product1,1200,Voluntari,Bucuresti,Romania,North America
+8,Product1,1200,Atlantida,Guatemala,Guatemala,Europe
+9,Product2,3600,Black River,Black River,Mauritius,North America
+10,Product3,800,Colentina,Bucuresti,Romania,Europe
+11,Product2,4000,Dortmund,NRW,Germany,Europe
+12,Product4,5300,Capetown,Western Cape,South Africa,Africa
+13,Product5,2500,Karlsruhe,BW,Germany,Europe

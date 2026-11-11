@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 290" width="850" height="290" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="head0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d35400"/>
+    </marker>
+    <marker id="head1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e7d32"/>
+    </marker>
+    <marker id="head2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7b3fa0"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="850" height="290" rx="8" fill="#ffffff"/>
+
+  <!-- 1D array -->
+  <text x="30" y="28" font-size="15" font-weight="bold" fill="#222">1D array: vector</text>
+  <text x="110" y="64" text-anchor="middle" fill="#444">Speed</text>
+  <g fill="#e8f1fb" stroke="#4a6fa5" stroke-width="1.2">
+    <rect x="70" y="72" width="80" height="34"/>
+    <rect x="70" y="106" width="80" height="34"/>
+    <rect x="70" y="140" width="80" height="34"/>
+    <rect x="70" y="174" width="80" height="34"/>
+  </g>
+  <g text-anchor="middle" fill="#222">
+    <text x="110" y="94">18.4</text>
+    <text x="110" y="128">25.1</text>
+    <text x="110" y="162">9.7</text>
+    <text x="110" y="196">21.3</text>
+  </g>
+  <line x1="52" y1="74" x2="52" y2="206" stroke="#d35400" stroke-width="2" marker-end="url(#head0)"/>
+  <text x="40" y="140" fill="#d35400" text-anchor="middle" transform="rotate(-90 40 140)">axis 0</text>
+  <text x="30" y="240" font-family="Consolas, monospace" fill="#222">shape (4,)   ndim 1</text>
+  <text x="30" y="262" fill="#555">cutting speed of 4 parts</text>
+
+  <!-- 2D array -->
+  <text x="270" y="28" font-size="15" font-weight="bold" fill="#222">2D array: matrix / table</text>
+  <line x1="322" y1="46" x2="558" y2="46" stroke="#2e7d32" stroke-width="2" marker-end="url(#head1)"/>
+  <text x="440" y="40" fill="#2e7d32" text-anchor="middle">axis 1 (columns = features)</text>
+  <g text-anchor="middle" fill="#444">
+    <text x="360" y="64">Thickness</text>
+    <text x="440" y="64">Speed</text>
+    <text x="520" y="64">Power</text>
+  </g>
+  <g fill="#e8f1fb" stroke="#4a6fa5" stroke-width="1.2">
+    <rect x="320" y="72" width="80" height="34"/><rect x="400" y="72" width="80" height="34"/><rect x="480" y="72" width="80" height="34"/>
+    <rect x="320" y="106" width="80" height="34"/><rect x="400" y="106" width="80" height="34"/><rect x="480" y="106" width="80" height="34"/>
+    <rect x="320" y="140" width="80" height="34"/><rect x="400" y="140" width="80" height="34"/><rect x="480" y="140" width="80" height="34"/>
+    <rect x="320" y="174" width="80" height="34"/><rect x="400" y="174" width="80" height="34"/><rect x="480" y="174" width="80" height="34"/>
+  </g>
+  <g text-anchor="middle" fill="#222">
+    <text x="360" y="94">1.02</text><text x="440" y="94">18.4</text><text x="520" y="94">1310</text>
+    <text x="360" y="128">0.85</text><text x="440" y="128">25.1</text><text x="520" y="128">1450</text>
+    <text x="360" y="162">1.21</text><text x="440" y="162">9.7</text><text x="520" y="162">1180</text>
+    <text x="360" y="196">0.97</text><text x="440" y="196">21.3</text><text x="520" y="196">1520</text>
+  </g>
+  <line x1="302" y1="74" x2="302" y2="206" stroke="#d35400" stroke-width="2" marker-end="url(#head0)"/>
+  <text x="290" y="140" fill="#d35400" text-anchor="middle" transform="rotate(-90 290 140)">axis 0 (rows = parts)</text>
+  <text x="270" y="240" font-family="Consolas, monospace" fill="#222">shape (4, 3)   ndim 2</text>
+  <text x="270" y="262" fill="#555">3 features of 4 parts</text>
+
+  <!-- 3D array -->
+  <text x="615" y="28" font-size="15" font-weight="bold" fill="#222">3D array</text>
+  <g stroke="#4a6fa5" stroke-width="1.2">
+    <g fill="#c9dcf2" transform="translate(32,-32)">
+      <rect x="640" y="130" width="96" height="72"/>
+      <path d="M664,130 V202 M688,130 V202 M712,130 V202 M640,154 H736 M640,178 H736" fill="none"/>
+    </g>
+    <g fill="#d8e6f6" transform="translate(16,-16)">
+      <rect x="640" y="130" width="96" height="72"/>
+      <path d="M664,130 V202 M688,130 V202 M712,130 V202 M640,154 H736 M640,178 H736" fill="none"/>
+    </g>
+    <g fill="#e8f1fb">
+      <rect x="640" y="130" width="96" height="72"/>
+      <path d="M664,130 V202 M688,130 V202 M712,130 V202 M640,154 H736 M640,178 H736" fill="none"/>
+    </g>
+  </g>
+  <line x1="746" y1="206" x2="780" y2="172" stroke="#d35400" stroke-width="2" marker-end="url(#head0)"/>
+  <text x="784" y="176" fill="#d35400">axis 0</text>
+  <line x1="626" y1="132" x2="626" y2="200" stroke="#2e7d32" stroke-width="2" marker-end="url(#head1)"/>
+  <text x="614" y="166" fill="#2e7d32" text-anchor="middle" transform="rotate(-90 614 166)">axis 1</text>
+  <line x1="642" y1="216" x2="734" y2="216" stroke="#7b3fa0" stroke-width="2" marker-end="url(#head2)"/>
+  <text x="688" y="232" fill="#7b3fa0" text-anchor="middle">axis 2</text>
+  <text x="615" y="254" font-family="Consolas, monospace" fill="#222">shape (3, 3, 4)   ndim 3</text>
+  <text x="615" y="276" fill="#555">3 grayscale images, 3 × 4 pixels</text>
+</svg>
