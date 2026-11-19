@@ -2,52 +2,19 @@ import ezdxf
 import matplotlib.pyplot as plt
 import math
 from shapely.geometry import Point, LineString, Polygon
+import numpy as np
 
-
-def get_dxf_bounds(path):
+def get_dxf_bound(path):
     """Compute bounding box (width, height) for a DXF file."""
     try:
         doc = ezdxf.readfile(path)
         msp = doc.modelspace()
 
-        min_x, min_y = float('inf'), float('inf')
-        max_x, max_y = float('-inf'), float('-inf')
+        from ezdxf import bbox
+        box = bbox.extents(msp)
+        width = box.extmax.x - box.extmin.x
+        height = box.extmax.y - box.extmin.y
 
-        for e in msp:
-            pts = []
-
-            if e.dxftype() == "LINE":
-                pts = [e.dxf.start, e.dxf.end]
-
-            elif e.dxftype() in ("CIRCLE", "ARC"):
-                c = e.dxf.center
-                r = e.dxf.radius
-                pts = [(c[0] - r, c[1] - r), (c[0] + r, c[1] + r)]
-
-            elif e.dxftype() == "LWPOLYLINE":
-                # Some tuples have >2 values → only take x, y
-                pts = [(float(p[0]), float(p[1])) for p in e.get_points() if len(p) >= 2]
-
-            elif e.dxftype() == "POLYLINE":
-                pts = [(float(v.dxf.x), float(v.dxf.y)) for v in e.vertices if hasattr(v, "dxf")]
-
-            elif e.dxftype() == "POINT":
-                p = e.dxf.location
-                pts = [(float(p[0]), float(p[1]))]
-
-            if not pts:
-                continue
-
-            # ensure each point has only x,y
-            xs, ys = zip(*[(p[0], p[1]) for p in pts if len(p) >= 2])
-            min_x, max_x = min(min_x, *xs), max(max_x, *xs)
-            min_y, max_y = min(min_y, *ys), max(max_y, *ys)
-
-        if min_x == float('inf') or min_y == float('inf'):
-            return None, None
-
-        width = max_x - min_x
-        height = max_y - min_y
         return width, height
 
     except Exception as ex:
@@ -78,6 +45,9 @@ def get_cutting_length(path):
                 total_length += 2 * math.pi * e.dxf.radius
 
             elif etype == "ARC":
+                if e.dxf.end_angle < e.dxf.start_angle:
+                    e.dxf.end_angle += 360
+
                 theta = math.radians(abs(e.dxf.end_angle - e.dxf.start_angle))
                 total_length += e.dxf.radius * theta
 
@@ -170,7 +140,9 @@ def load_dxf_geometry(file_path):
     lines = []
 
     for e in msp:
-        etype = e.dxftype()
+        etype = e.dxftype() 
+        
+
 
         # Closed 2D polyline
         if etype == "LWPOLYLINE" and e.closed:
@@ -201,6 +173,23 @@ def load_dxf_geometry(file_path):
         elif etype == "LINE":
             s, t = e.dxf.start, e.dxf.end
             lines.append(LineString([(s[0], s[1]), (t[0], t[1])]))
+
+        elif etype == "ARC":
+            center_x = e.dxf.center[0]
+            center_y = e.dxf.center[1] 
+            start_angle = e.dxf.start_angle
+            end_angle = e.dxf.end_angle
+            radius = e.dxf.radius
+            if end_angle < start_angle:
+                end_angle += 360
+            theta = np.radians(np.linspace(start_angle,end_angle,100))
+            x = center_x + radius * np.cos(theta)
+            y = center_y + radius * np.sin(theta)
+            arc = LineString(np.column_stack([x, y]))
+            lines.append(arc)
+
+
+
 
     return polygons, lines
 
