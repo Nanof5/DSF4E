@@ -2,6 +2,8 @@ import ezdxf
 import matplotlib.pyplot as plt
 import math
 from shapely.geometry import Point, LineString, Polygon
+from shapely.ops import polygonize, unary_union
+import shapely
 import numpy as np
 
 def get_dxf_bound(path):
@@ -76,16 +78,9 @@ def get_cutting_length(path):
 
 
 def get_number_of_holes(path, area_tolerance=1e-3):
-    """
-    Estimate the number of holes (internal cutouts) in a DXF file.
+ 
+    # Estimate the number of holes (internal cutouts) in a DXF file.
 
-    Args:
-        path (str): DXF file path.
-        area_tolerance (float): small threshold to ignore degenerate loops.
-
-    Returns:
-        int: Number of detected holes.
-    """
     try:
         doc = ezdxf.readfile(path)
         msp = doc.modelspace()
@@ -120,7 +115,13 @@ def get_number_of_holes(path, area_tolerance=1e-3):
 
         # Add closed loops that are *inside* another larger loop
         for i, poly in enumerate(loops):
-            is_inside = any(other.contains(poly) for j, other in enumerate(loops) if j != i)
+            is_inside = False
+            for j, other in enumerate(loops):
+                if j == i:
+                    continue                 # do not compare a loop with itself
+                if other.contains(poly):
+                    is_inside = True         # poly lies inside another loop -> hole
+                    break                    # one containing loop is enough
             if is_inside:
                 hole_count += 1
 
@@ -129,6 +130,55 @@ def get_number_of_holes(path, area_tolerance=1e-3):
     except Exception as ex:
         print(f"Error reading {path}: {ex}")
         return 0
+
+
+def get_closed_contours(msp, precision=1e-6):
+    
+    #Join the LINE, ARC and CIRCLE entities of a modelspace into closed contours. Returns a list of contours
+
+
+    segments = []
+    for e in msp:
+        etype = e.dxftype()
+        if etype == "LINE":
+            segments.append(LineString([(e.dxf.start.x, e.dxf.start.y), (e.dxf.end.x, e.dxf.end.y)]))
+        elif etype in ("ARC", "CIRCLE"):
+            segments.append(LineString([(p.x, p.y) for p in e.flattening(sagitta=0.01)]))
+
+    if not segments:
+        return []
+
+    # Snap end points onto a fine grid and split segments at intersections,
+    # then let Shapely find all closed contours
+    network = shapely.set_precision(unary_union(segments), precision)
+    return [Polygon(face.exterior) for face in polygonize(network)]
+
+
+def get_part_area(path):
+
+    #Compute the net area of the part: area of the outer contour minus the area of all holes.
+
+    try:
+        msp = ezdxf.readfile(path).modelspace()
+    except Exception as ex:
+        print(f"Error reading {path}: {ex}")
+        return None
+
+    loops = get_closed_contours(msp)
+    if not loops:
+        return None
+
+    # The contour enclosing the largest area is the outer contour,
+    # every contour inside it is a hole
+    outer = max(loops, key=lambda p: p.area)
+    holes_area = 0.0
+
+    for loop in loops:
+        if loop is outer:
+            continue                     # outer contour itself is not a hole
+        if outer.contains(loop):
+            holes_area += loop.area      # contour inside the outer contour = hole
+    return outer.area - holes_area
 
 
 def load_dxf_geometry(file_path):
@@ -142,8 +192,6 @@ def load_dxf_geometry(file_path):
     for e in msp:
         etype = e.dxftype() 
         
-
-
         # Closed 2D polyline
         if etype == "LWPOLYLINE" and e.closed:
             points = [(p[0], p[1]) for p in e.get_points()]
@@ -170,7 +218,7 @@ def load_dxf_geometry(file_path):
             polygons.append(circle)
 
         # Line
-        elif etype == "LINE":
+        elif etype == "LINE" and e.dxf.linetype == "Continuous":
             s, t = e.dxf.start, e.dxf.end
             lines.append(LineString([(s[0], s[1]), (t[0], t[1])]))
 
@@ -187,9 +235,6 @@ def load_dxf_geometry(file_path):
             y = center_y + radius * np.sin(theta)
             arc = LineString(np.column_stack([x, y]))
             lines.append(arc)
-
-
-
 
     return polygons, lines
 
