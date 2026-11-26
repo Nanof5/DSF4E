@@ -39,6 +39,9 @@ def get_cutting_length(path):
         try:
             etype = e.dxftype()
 
+            if e.dxf.linetype != "Continuous":
+                continue                     # center lines etc. are not cut
+
             if etype == "LINE":
                 s, t = e.dxf.start, e.dxf.end
                 total_length += math.dist((s[0], s[1]), (t[0], t[1]))
@@ -77,59 +80,23 @@ def get_cutting_length(path):
     return total_length
 
 
-def get_number_of_holes(path, area_tolerance=1e-3):
- 
-    # Estimate the number of holes (internal cutouts) in a DXF file.
+def get_number_of_holes(path):
+
+    # Count the holes (internal cutouts): all closed contours inside the outer contour.
 
     try:
-        doc = ezdxf.readfile(path)
-        msp = doc.modelspace()
-
-        loops = []  # store shapely geometries for closed shapes
-        circles = []  # store circle geometries
-
-        for e in msp:
-            etype = e.dxftype()
-
-            if etype == "CIRCLE":
-                c = e.dxf.center
-                r = e.dxf.radius
-                circles.append(Point(c[0], c[1]).buffer(r))
-
-            elif etype in ("LWPOLYLINE", "POLYLINE"):
-                pts = []
-                if etype == "LWPOLYLINE":
-                    pts = [(float(p[0]), float(p[1])) for p in e.get_points()]
-                    closed = bool(e.closed)
-                else:
-                    pts = [(float(v.dxf.x), float(v.dxf.y)) for v in e.vertices if hasattr(v, "dxf")]
-                    closed = e.is_closed
-
-                if closed and len(pts) > 2:
-                    poly = Polygon(pts)
-                    if abs(poly.area) > area_tolerance:
-                        loops.append(poly)
-
-        # Start by counting all circles as holes
-        hole_count = len(circles)
-
-        # Add closed loops that are *inside* another larger loop
-        for i, poly in enumerate(loops):
-            is_inside = False
-            for j, other in enumerate(loops):
-                if j == i:
-                    continue                 # do not compare a loop with itself
-                if other.contains(poly):
-                    is_inside = True         # poly lies inside another loop -> hole
-                    break                    # one containing loop is enough
-            if is_inside:
-                hole_count += 1
-
-        return hole_count
-
+        msp = ezdxf.readfile(path).modelspace()
     except Exception as ex:
         print(f"Error reading {path}: {ex}")
-        return 0
+        return None
+
+    loops = get_closed_contours(msp)
+    if not loops:
+        return None
+
+    # The contour enclosing the largest area is the outer contour (not a hole)
+    outer = max(loops, key=lambda p: p.area)
+    return sum(1 for loop in loops if loop is not outer and outer.contains(loop))
 
 
 def get_closed_contours(msp, precision=1e-6):
@@ -140,6 +107,8 @@ def get_closed_contours(msp, precision=1e-6):
     segments = []
     for e in msp:
         etype = e.dxftype()
+        if e.dxf.linetype != "Continuous":
+            continue                         # center lines etc. are not cut
         if etype == "LINE":
             segments.append(LineString([(e.dxf.start.x, e.dxf.start.y), (e.dxf.end.x, e.dxf.end.y)]))
         elif etype in ("ARC", "CIRCLE"):
@@ -261,3 +230,4 @@ def plot_dxf(file_path):
     plt.ylabel("Y")
     plt.grid(True)
     plt.show()
+
