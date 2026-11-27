@@ -1,5 +1,6 @@
-pandas
-matplotlib
+pandas as pd
+matplotlib as plt
 ezdxf
 shapely
 jupyter
+os
