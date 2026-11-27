@@ -1,0 +1,33 @@
+# Python-Cache (wird automatisch beim Import erzeugt)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtuelle Umgebungen (lokal pro Rechner)
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+.virtual_documents/
+__marimo__/
+
+# VS Code (lokaler Verlauf)
+.history/
+
+# Editor- und Office-Zwischendateien
+*.swp
+*.swo
+*~
+~$*
+*.tmp
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
