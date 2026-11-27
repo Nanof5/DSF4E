@@ -3,5 +3,4 @@ matplotlib
 ezdxf
 shapely
 jupyter
-os
 seaborn
